@@ -35,7 +35,7 @@ def main():
 
         #Definição das constantes
         c2 = 20
-        nx = 200
+        nx = 100
         delta_x = 1/nx
         x_c = 0.7
         nt = 1000
@@ -60,6 +60,9 @@ def main():
         B = monta_matriz_B(u, ti, tf, xk, xr, delta_x, delta_t, K)
         C = monta_matriz_C(u, ti, tf, xk, xr, delta_x, delta_t, K)
         print("passei??")
+        a = [0, 0, 0]
+        a = metodo_SOR(B, a, C, w = 1.6, number_it = 10000)
+        print(a)
         #Criação do eixo x da função de plotagem
         eixo_x = []
         for j in range(0, nx+1):
@@ -196,6 +199,25 @@ def monta_matriz_C(u, ti, tf, xk, xr, delta_x, delta_t, K):
         C[i] = (delta_t/2)*(g0 + gn + 2*Somatorio)
 
     return C
+
+#-------------------------------------------------------------------------------
+def metodo_SOR(B, a, C, w, number_it):
+
+    for k in range(number_it):
+        for i in range(len(a)):
+            Somatorio1 = 0
+            j = 0
+            while j < i:
+                Somatorio1 += B[i][j]*a[j]
+                j += 1
+            Somatorio2 = 0
+            j = i+1
+            while j < len(a):
+                Somatorio2 += B[i][j]*a[j]
+                j += 1
+            a[i] = (1-w)*a[i] + (w/B[i][i])*(C[i] - Somatorio1 - Somatorio2)
+
+    return a
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
